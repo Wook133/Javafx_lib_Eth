@@ -7,6 +7,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
@@ -25,6 +26,7 @@ public class loginController {
     public PasswordField txtPass;
     public Button btnLoad;
     public Button btnLogin;
+    boolean correctdetails = false;
 
     public File selectedFile;
     public String sPath;
@@ -62,6 +64,7 @@ public class loginController {
 
     private void login(TextField txtPassword)
     {
+
         try {
             sPassword = txtPassword.getText();
             System.out.println("Password: " + sPassword);
@@ -69,6 +72,12 @@ public class loginController {
             System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
             Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
             System.out.println("Credentials loaded: " + credentials.getAddress());
+            correctdetails = true;
+            System.out.println("Correct Password and keystore combo");
+        }
+        catch (CipherException ce)
+        {
+            System.out.println("Wrong Password and keystore combo");
         }
         catch (Exception e)
         {
