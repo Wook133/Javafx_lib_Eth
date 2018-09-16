@@ -52,6 +52,25 @@ public class Runner extends Application {
 
     }
 
+    public Scene createMenu(Stage stage)
+    {
+        GridPane grid = new GridPane();
+        grid.setPrefWidth(300.0);
+        grid.setPrefHeight(300.0);
+        grid.setVgap(4);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        Button btnApproval = new Button("Approval");
+        Button btnAddInformaion = new Button("Add Information");
+
+        grid.add(new Label("hello"), 0, 0);
+        grid.add(new Label("world"), 1, 0);
+        grid.add(new Label("my"), 0, 1);
+        grid.add(new Label("...."), 1, 1);
+        grid.add(new Label("name is Judd"), 0, 2, 2,2);
+        scMenu = new Scene((grid));
+        return scMenu;
+    }
+
     public Scene createLoginScene(Stage stage) {
 
         BorderPane borderPane = new BorderPane();
@@ -87,18 +106,9 @@ public class Runner extends Application {
             login(txtPassword, stage);
             if (loggedIn)
             {
-                GridPane grid = new GridPane();
-                grid.setVgap(4);
-                grid.setPadding(new Insets(5, 5, 5, 5));
-                grid.add(new Label("hello"), 0, 0);
-                grid.add(new Label("world"), 1, 0);
-                grid.add(new Label("my"), 0, 1);
-                grid.add(new Label("...."), 1, 1);
-                grid.add(new Label("name is Judd"), 0, 2, 2,2);
-                scTemp.set(new Scene((grid)));
+                scTemp.set(createMenu(stage));
                 stage.setScene(scTemp.get());
             }
-
         });
         return scTemp.get();
     }
