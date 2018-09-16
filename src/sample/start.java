@@ -8,17 +8,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class start extends Application {
+    boolean loggedIn = false;
     public static void main(String[] args) {
         launch(args);
     }
-    public Scene createScene() {
+    public Scene createLoginScene() {
+
         BorderPane borderPane = new BorderPane();
         borderPane.setPrefWidth(300.0);
         FlowPane flowPane = new FlowPane();
@@ -49,52 +48,48 @@ public class start extends Application {
         );
         Canvas canvas = new Canvas(200, 200);
         canvas.setId("canvas");
+        if (loggedIn)
+        {
+            borderPane.setVisible(false);
+            btnLoad.setVisible(false);
+            btnLogin.setVisible(false);
+        }
 
         borderPane.setTop(flowPane);
         borderPane.setCenter(canvas);
 
         return new Scene(borderPane);
-
-        // add some buttons
-        /*TitledPane gridTitlePane = new TitledPane();
-        GridPane grid = new GridPane();
-        grid.setVgap(4);
-        grid.setPadding(new Insets(5, 5, 5, 5));
-        grid.add(new Label("Select your Keystore: "), 0, 0);
-
-        Button btnLoad = new Button("Load");
-        btnLoad.setId("load");
-        Button btnLogin = new Button("Login");
-        btnLogin.setId("login");
-        TextField txtPassword = new TextField("Enter Password");
-        txtPassword.setId("password");
-
-        grid.add(btnLoad, 1, 0);
-        grid.add(new Label("Password: "), 0, 1);
-        grid.add(txtPassword, 1, 1);
-        grid.add(new Label("Login ready: "), 0, 2);
-        grid.add(btnLogin, 1, 2);
-
-        Canvas canvas = new Canvas(500, 500);
-        canvas.setId("canvas");
-
-        gridTitlePane.setText("Login");
-        gridTitlePane.setContent(grid);
-        borderPane.setTop(gridTitlePane);
-        borderPane.setCenter(canvas);
-
-        return new Scene(borderPane);*/
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("deVill Wagyu");
 
-        Scene scene = createScene();
+        Scene sceneLogin = createLoginScene();
         loginController controller = new loginController();
-        controller.linkToUI(primaryStage, scene);
+        controller.linkToUI(primaryStage, sceneLogin);
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        loggedIn = controller.correctdetails;
+        if (loggedIn == false)
+        {
+            primaryStage.setScene(sceneLogin);
+            primaryStage.show();
+            System.out.println(loggedIn);
+        }
+        else {
+            Label label2= new Label("This is the second scene");
+            Button button2= new Button("Go to scene 1");
+
+            VBox layout2= new VBox(20);
+            layout2.getChildren().addAll(label2, button2);
+            Scene scene2 = new Scene(layout2,300,250);
+            primaryStage.setScene(scene2);
+            primaryStage.show();
+            System.out.println(loggedIn);
+        }
+
+
+
+
     }
 
 }

@@ -31,7 +31,8 @@ public class loginController {
     public File selectedFile;
     public String sPath;
     public String sPassword;
-    public void linkToUI(Stage stage, Scene scene) throws Exception {
+
+    public boolean linkToUI(Stage stage, Scene scene) throws Exception {
         // remember the stage
         this.stage = stage;
         // obtain controls
@@ -39,10 +40,13 @@ public class loginController {
         Button btnLoad = (Button) scene.lookup("#load");
         Button btnLogin = (Button) scene.lookup("#login");
         TextField txtPassword = (TextField) scene.lookup("#password");
-        btnLoad.setOnAction(event -> load());
+        btnLoad.setOnAction(event -> loadKeystore());
         btnLogin.setOnAction(event -> login(txtPassword));
+        return correctdetails;
+
+
     }
-    private void load()
+    private void loadKeystore()
     {
         try {
         // create a file chooser that opens *.shapes files
@@ -55,6 +59,7 @@ public class loginController {
         System.out.println(selectedFile.getAbsolutePath());
         sPath = selectedFile.getAbsolutePath().replaceAll("[/\\\\]", "//");
         System.out.println(sPath);
+
         }
         catch (Exception e)
         {
@@ -74,6 +79,7 @@ public class loginController {
             System.out.println("Credentials loaded: " + credentials.getAddress());
             correctdetails = true;
             System.out.println("Correct Password and keystore combo");
+
         }
         catch (CipherException ce)
         {
