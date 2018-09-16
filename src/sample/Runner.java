@@ -15,8 +15,11 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.Contract;
+import org.web3j.tx.ManagedTransaction;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
@@ -55,19 +58,72 @@ public class Runner extends Application {
     public Scene createApproval(Stage stage)
     {
         GridPane grid = new GridPane();
-        grid.setPrefWidth(300.0);
-        grid.setPrefHeight(300.0);
+        grid.setPrefWidth(400.0);
+        grid.setPrefHeight(200.0);
         grid.setVgap(4);
         grid.setPadding(new Insets(5, 5, 5, 5));
         Label lblAddress = new Label("Please enter Address");
         TextField txtAddress = new TextField();
+        Button btnAddOwner = new Button("Add Owner");
+        btnAddOwner.setOnAction(event ->
+        {
+            try {
+                Web3j web3j = Web3j.build(new HttpService());
+                System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+                Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                contract.addOwners(txtAddress.getText());
+                System.out.println("Owner added with approval for " + txtAddress.getText());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Failure");
+            }
+        });
         Button btnAddApproval = new Button("Approve");
+        btnAddApproval.setOnAction(event ->
+        {
+            try {
+                Web3j web3j = Web3j.build(new HttpService());
+                System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+                Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                contract.addApproval(txtAddress.getText());
+                System.out.println("Approval for " + txtAddress.getText());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Failure");
+            }
+        });
+
         Button btnRemoveApproval = new Button("Disapprove");
+        btnAddApproval.setOnAction(event ->
+        {
+            try {
+                Web3j web3j = Web3j.build(new HttpService());
+                System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+                Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                contract.removeApproval(txtAddress.getText());
+                System.out.println("Removed approval for " + txtAddress.getText());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Failure");
+            }
+        });
+
         Button btnMenu = new Button("Menu");
+        btnMenu.setOnAction(event ->
+        {
+            stage.setScene(createMenu(stage));
+        });
         grid.add(lblAddress, 0, 0);
         grid.add(txtAddress, 1, 0);
         grid.add(btnAddApproval, 0, 1);
-        grid.add(btnRemoveApproval, 1, 1);
+        grid.add(btnAddOwner, 1, 1);
+        grid.add(btnRemoveApproval, 2, 1);
         grid.add(btnMenu, 0,2,2,1);
         scApproval = new Scene(grid);
         return scApproval;
