@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
     boolean loggedIn = false;
-    String smartcontractaddress1 = "0x409780d204b5df57a021652da76e77dfb8342746";
-    String smartcontractaddress2 = "0x2979e5ad0dd719f9689300e54687059398e0d336";
+    String smartcontractaddress1 = "0xef9e839064631c365162877c038d25304d4deb3a";
+    String smartcontractaddress2 = "0xfb1203e8db28cf7cd6b9e21d66c4eae8b9977c64";
 
     public File selectedFile;
     public String sPath;
@@ -71,7 +71,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addOwners(txtAddress.getText());
                 System.out.println("Owner added with approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -87,7 +87,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addApproval(txtAddress.getText());
                 System.out.println("Approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -104,7 +104,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.removeApproval(txtAddress.getText());
                 System.out.println("Removed approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -129,6 +129,19 @@ public class Runner extends Application {
         return scApproval;
     }
 
+    public Scene createAddInformation(Stage stage)
+    {
+        GridPane grid = new GridPane();
+        grid.setPrefWidth(400.0);
+        grid.setPrefHeight(200.0);
+        grid.setVgap(4);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        Label lblAddress = new Label("Please enter Address");
+        TextField txtAddress = new TextField();
+        Button btnAddOwner = new Button("Add Owner");
+        return scAddInformation;
+    }
+
 
 
     public Scene createMenu(Stage stage)
@@ -147,7 +160,10 @@ public class Runner extends Application {
         Button btnGetInformation = new Button("Get Information");
         Button btnGetAllCows = new Button("All Wagyu Cattle");
         Button btnGetAllOwners = new Button("All Owners");
+
         Button btnClose = new Button("Close");
+        btnClose.setOnAction(event -> stage.close());
+
         grid.add(btnApproval, 0, 0);
         grid.add(btnAddInformaion, 1, 0);
         grid.add(btnGetInformation, 0, 1);
