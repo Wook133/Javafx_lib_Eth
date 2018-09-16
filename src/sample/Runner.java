@@ -52,6 +52,29 @@ public class Runner extends Application {
 
     }
 
+    public Scene createApproval(Stage stage)
+    {
+        GridPane grid = new GridPane();
+        grid.setPrefWidth(300.0);
+        grid.setPrefHeight(300.0);
+        grid.setVgap(4);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        Label lblAddress = new Label("Please enter Address");
+        TextField txtAddress = new TextField();
+        Button btnAddApproval = new Button("Approve");
+        Button btnRemoveApproval = new Button("Disapprove");
+        Button btnMenu = new Button("Menu");
+        grid.add(lblAddress, 0, 0);
+        grid.add(txtAddress, 1, 0);
+        grid.add(btnAddApproval, 0, 1);
+        grid.add(btnRemoveApproval, 1, 1);
+        grid.add(btnMenu, 0,2,2,1);
+        scApproval = new Scene(grid);
+        return scApproval;
+    }
+
+
+
     public Scene createMenu(Stage stage)
     {
         GridPane grid = new GridPane();
@@ -59,14 +82,22 @@ public class Runner extends Application {
         grid.setPrefHeight(300.0);
         grid.setVgap(4);
         grid.setPadding(new Insets(5, 5, 5, 5));
+
         Button btnApproval = new Button("Approval");
+        btnApproval.setOnAction(event -> stage.setScene(createApproval(stage)));
+
         Button btnAddInformaion = new Button("Add Information");
 
-        grid.add(new Label("hello"), 0, 0);
-        grid.add(new Label("world"), 1, 0);
-        grid.add(new Label("my"), 0, 1);
-        grid.add(new Label("...."), 1, 1);
-        grid.add(new Label("name is Judd"), 0, 2, 2,2);
+        Button btnGetInformation = new Button("Get Information");
+        Button btnGetAllCows = new Button("All Wagyu Cattle");
+        Button btnGetAllOwners = new Button("All Owners");
+        Button btnClose = new Button("Close");
+        grid.add(btnApproval, 0, 0);
+        grid.add(btnAddInformaion, 1, 0);
+        grid.add(btnGetInformation, 0, 1);
+        grid.add(btnGetAllCows, 1, 1);
+        grid.add(btnGetAllOwners, 0, 2);
+        grid.add(btnClose, 1, 2);
         scMenu = new Scene((grid));
         return scMenu;
     }
