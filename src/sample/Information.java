@@ -5,14 +5,17 @@ import javafx.beans.property.StringProperty;
 
 public class Information
 {
-    private StringProperty cowAddress = new SimpleStringProperty();
-    private StringProperty ownerAddress = new SimpleStringProperty();
-    private StringProperty info = new SimpleStringProperty();
+    private final SimpleStringProperty cowAddress;// = new SimpleStringProperty();
+    private final SimpleStringProperty ownerAddress;// = new SimpleStringProperty();
+    private final SimpleStringProperty info;// = new SimpleStringProperty();
 
     public Information(String cowAddress, String ownerAddress, String info) {
-        this.cowAddress.set(cowAddress);
+        this.cowAddress = new SimpleStringProperty(cowAddress);
+        this.ownerAddress = new SimpleStringProperty(ownerAddress);
+        this.info = new SimpleStringProperty(info);
+        /*this.cowAddress.set(cowAddress);
         this.ownerAddress.set(ownerAddress);
-        this.info.set(info);
+        this.info.set(info);*/
     }
 
     @Override

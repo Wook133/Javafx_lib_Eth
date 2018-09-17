@@ -44,7 +44,7 @@ public class deployContracts {
                 web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT, new BigInteger("100000"), "0xE9C2A56b8A3a29C8c85960Bb0037B786e5B85e56", "InfoTemp"
         ).send();
         String contractAddress1 = contract1.getContractAddress();
-        System.out.println("Smart contract 1 deployed to address " + contractAddress1);
+        System.out.println("Smart contract P3AbsoluteBasic_sol_CowOwnerInfo 1 deployed to address " + contractAddress1);
 
 
         P3AbsoluteBasic_sol_lifeInformation contract2 = P3AbsoluteBasic_sol_lifeInformation.deploy(
@@ -53,7 +53,7 @@ public class deployContracts {
 
 
         String contractAddress2 = contract2.getContractAddress();
-        System.out.println("Smart contract 2 deployed to address " + contractAddress2);
+        System.out.println("Smart contract P3AbsoluteBasic_sol_lifeInformation 2 deployed to address " + contractAddress2);
 
 
 

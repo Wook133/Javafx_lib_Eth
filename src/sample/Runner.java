@@ -1,14 +1,17 @@
 package sample;
 //https://medium.com/coinmonks/ethereum-blockchain-hello-world-smart-contract-with-java-9b6ae2961ad1
+import com.sun.xml.internal.txw2.TxwException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Triple;
@@ -21,18 +24,20 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tx.Contract;
 import org.web3j.tx.ManagedTransaction;
+import org.web3j.tx.exceptions.ContractCallException;
 
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Observable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
     boolean loggedIn = false;
-    String smartcontractaddress1 = "0x375382fc7114a253e09d5e869ccf7ee3efa25502";
-    String smartcontractaddress2 = "0x46d7d9a5af1ce9776861899d72609a97713c49f7";
+    String smartcontractaddress1 = "0x9dc9ca5d4150b98ffc43782df44832c9189a0c3d";
+    String smartcontractaddress2 = "0x375382fc7114a253e09d5e869ccf7ee3efa25502";
 
     ArrayList<String> ownerAddress = new ArrayList<>();
     ArrayList<Triple<String, String, String>> listInfo = new ArrayList<>();
@@ -59,7 +64,12 @@ public class Runner extends Application {
             observeInfo.add(cur);
             System.out.println(cur.toString());
         }
+    }
 
+    public static ObservableList<Information> popObservableData(ArrayList<Information> listInfo)
+    {
+        ObservableList<Information> data = FXCollections.observableArrayList(listInfo);
+        return data;
     }
 
     public static void main(String[] args) {
@@ -173,7 +183,7 @@ public class Runner extends Application {
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
                 P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addInformation(txtAddress.getText(), txtInfo.getText()).send();
-                System.out.println("Information added to Ethereum ");
+                System.out.println("Information added to Ethereum : " + txtAddress.getText() + ", " + credentials.getAddress() +", " + txtInfo.getText());
                 Triple<String, String, String> cur = Triple.of(txtAddress.getText(), credentials.getAddress(), txtInfo.getText());
                 listInfo.add(cur);
                 listInfo.sort(new sortByCow());
@@ -202,42 +212,47 @@ public class Runner extends Application {
 
     public Scene createViewInformation(Stage stage)
     {
-        VBox root = new VBox();
-        root.setSpacing(10);
-        root.setFillWidth(true);
-        root.setPadding(new Insets(5));
-
-       // setupInformation();
-
-        TableView<Information> tblInformation = new TableView<>();
+        Scene scene = new Scene(new Group());
+        stage.setTitle("All Information");
+        stage.setWidth(850);
+        stage.setHeight(520);
+        TableView table = new TableView();
+        final Label label = new Label("Address Book");
+        label.setFont(new Font("Arial", 16));
+        table.setEditable(true);
         TableColumn colCowAdd = new TableColumn("Wagyu Address");
-
-        colCowAdd.setCellValueFactory(new PropertyValueFactory("wagyu_address"));
+        colCowAdd.setCellValueFactory(new PropertyValueFactory<Information, String>("cowAddress"));
         colCowAdd.setPrefWidth(200);
-
         TableColumn colOwnerAdd = new TableColumn("Owner Address");
-        colOwnerAdd.setCellValueFactory(new PropertyValueFactory("owner_address"));
         colOwnerAdd.setPrefWidth(200);
-
+        colOwnerAdd.setCellValueFactory(new PropertyValueFactory<Information, String>("ownerAddress"));
         TableColumn colInfo = new TableColumn("Information");
-        colInfo.setCellValueFactory(new PropertyValueFactory("information"));
+        colInfo.setCellValueFactory(new PropertyValueFactory<Information, String>("info"));
         colInfo.setPrefWidth(400);
 
-        tblInformation.setId("table");
-        tblInformation.getColumns().addAll(colCowAdd, colOwnerAdd, colInfo);
-        tblInformation.setItems(observeInfo);
-
+        listRealInfo.add(new Information("c0", "a0", "I0"));
+        listRealInfo.add(new Information("c0", "a0", "I1"));
+        listRealInfo.add(new Information("c1", "a0", "I0"));
+        listRealInfo.add(new Information("c1", "a0", "I1"));
+        listRealInfo.add(new Information("c2", "a1", "I0"));
+        listRealInfo.add(new Information("c2", "a1", "I1"));
+        listRealInfo.add(new Information("c2", "a1", "I0"));
+        listRealInfo.add(new Information("c2", "a1", "I1"));
 
         Button btnMenu = new Button("Menu");
         btnMenu.setOnAction(event ->
         {
             stage.setScene(createMenu(stage));
         });
-        root.getChildren().addAll(
-                new Label("Information"), btnMenu);
-        scAddInformation = new Scene(root);
-
-        return scGetInformation;
+        final ObservableList<Information> data  = popObservableData(listRealInfo);
+        table.setItems(data);
+        table.getColumns().addAll(colCowAdd, colOwnerAdd, colInfo);
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(label, table, btnMenu);
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+        return scene;
     }
 
 
@@ -245,7 +260,7 @@ public class Runner extends Application {
     {
         GridPane grid = new GridPane();
         grid.setPrefWidth(300.0);
-        grid.setPrefHeight(300.0);
+        grid.setPrefHeight(150.0);
         grid.setVgap(4);
         grid.setPadding(new Insets(5, 5, 5, 5));
 
@@ -271,6 +286,7 @@ public class Runner extends Application {
         grid.add(btnGetAllOwners, 0, 2);*/
         grid.add(btnClose, 1, 2);
         scMenu = new Scene((grid));
+
         return scMenu;
     }
 
@@ -349,31 +365,58 @@ public class Runner extends Application {
             System.out.println("Correct Password and keystore combo");
             P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
             RemoteCall<BigInteger> counter = contract.getCountOwners();
-            System.out.println(counter.send());
-            for (int i =0; i <= Integer.valueOf(counter.send().toString()); i++)
-            {
+            System.out.println("OWNERS: " + counter.send());
+            for (int i = 0; i <= Integer.valueOf(counter.send().toString()) - 1; i++) {
                 String s = contract.getOwner(BigInteger.valueOf(i)).send();
                 ownerAddress.add(s);
                 System.out.println(s);
             }
             RemoteCall<BigInteger> counterInfo = contract.getCountCows();
+
             System.out.println("COWS: " + counterInfo.send());
-            for (int j =0; j <= Integer.valueOf(counterInfo.send().toString()); j++)
+           /* try {
+                String s = contract.getInformationPos(BigInteger.valueOf(0)).send();
+                System.out.println(s);
+            }
+            catch (ContractCallException exc)
             {
+                exc.printStackTrace();
+            }*/
+
+            /*RemoteCall<String> one      = contract.getCowAddressPos(BigInteger.valueOf(1));
+            RemoteCall<String> two      = contract.getPublisherPos(BigInteger.valueOf(1));
+            CompletableFuture<String> three    = contract.getInformationPos(BigInteger.valueOf(0)).sendAsync();*/
+
+           /* System.out.println(one.send().toString());
+            System.out.println(two.send().toString());
+            System.out.println(three.);*/
+           /* for (int j = 0; j <= Integer.valueOf(counterInfo.send().toString()) - 1; j++) {
+                RemoteCall<String> one      = contract.getCowAddressPos(BigInteger.valueOf(j));
+                RemoteCall<String> two      = contract.getPublisherPos(BigInteger.valueOf(j));
+                RemoteCall<String> three    = contract.getInformationPos(BigInteger.valueOf(j));
+
+                System.out.println(one.send().toString());
+                System.out.println(two.send().toString());
+                System.out.println(three.send().toString());
+                Triple<String, String, String> temp = Triple.of(one.send(), two.send(), three.send());
+                listInfo.add(temp);
+                System.out.println(temp.toString());
                 //System.out.println(contract.getPos(BigInteger.valueOf(i)).send().toString());
 
                /* Tuple3<String, String, String> s = new Tuple3<>(contract.getPos(BigInteger.valueOf(j)).send().getValue1(),
                         contract.getPos(BigInteger.valueOf(j)).send().getValue2(),
                         contract.getPos(BigInteger.valueOf(j)).send().getValue3()) ;
-                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());*/
-                Triple<String, String, String> stemp = Triple.of(contract.getPos(BigInteger.valueOf(j)).send().getValue1(),
-                        contract.getPos(BigInteger.valueOf(j)).send().getValue2(),
-                        contract.getPos(BigInteger.valueOf(j)).send().getValue3());
+                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());
+                Triple<String, String, String> stemp = Triple.of(contract.getCowAddressPos(BigInteger.valueOf(j)).send(),
+                        contract.getCowAddressPos(BigInteger.valueOf(j)).send(),
+                        contract.getInformationPos(BigInteger.valueOf(j)).send());
                 listInfo.add(stemp);
-                System.out.println(stemp.toString());
-            }
+                System.out.println(stemp.toString());*/
+
+           /* }*/
             listInfo.sort(new sortByCow());
         }
+
 
         catch (CipherException ce)
         {
