@@ -36,8 +36,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
     boolean loggedIn = false;
-    String smartcontractaddress1 = "0x9dc9ca5d4150b98ffc43782df44832c9189a0c3d";
-    String smartcontractaddress2 = "0x375382fc7114a253e09d5e869ccf7ee3efa25502";
+    String smartcontractaddress1 = "0xc83bebe3fe6f197715d18d9723458802ce068c8f";
+    //String smartcontractaddress2 = "0x519ad27415a49596d915ea9eb4687b2d5108b255";
 
     ArrayList<String> ownerAddress = new ArrayList<>();
     ArrayList<Triple<String, String, String>> listInfo = new ArrayList<>();
@@ -105,7 +105,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addOwners(txtAddress.getText()).send();
                 System.out.println("Owner added with approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -121,7 +121,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addApproval(txtAddress.getText()).send();
                 System.out.println("Approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -138,7 +138,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.removeApproval(txtAddress.getText()).send();
                 System.out.println("Removed approval for " + txtAddress.getText());
             } catch (Exception e)
@@ -181,7 +181,7 @@ public class Runner extends Application {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-                P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
                 contract.addInformation(txtAddress.getText(), txtInfo.getText()).send();
                 System.out.println("Information added to Ethereum : " + txtAddress.getText() + ", " + credentials.getAddress() +", " + txtInfo.getText());
                 Triple<String, String, String> cur = Triple.of(txtAddress.getText(), credentials.getAddress(), txtInfo.getText());
@@ -216,15 +216,16 @@ public class Runner extends Application {
             Web3j web3j = Web3j.build(new HttpService());
             System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
             Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
-            P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
-            BigInteger biCount =  contract.getCountCows().send();
+            CompleteBasic_sol_lifeInformation contract1 = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+            BigInteger biCount =  contract1.getCountCows().send();
             Integer counter = Integer.valueOf(biCount.toString());
             System.out.println("Cow Information Counter = " + counter);
-            for (int i = 0; i <= counter; i++)
+            System.out.println("Cow =" + contract1.getCowAddressPos(BigInteger.ZERO).send());
+            /*for (int i = 0; i <= counter; i++)
             {
-                String sInfo = contract.getPublisherPos(BigInteger.valueOf(i)).send();
+                String sInfo = contract2.getPublisherPos(BigInteger.valueOf(i)).send();
                 System.out.println(sInfo);
-            }
+            }*/
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -382,7 +383,7 @@ public class Runner extends Application {
             System.out.println("Credentials loaded: " + credentials.getAddress());
             loggedIn = true;
             System.out.println("Correct Password and keystore combo");
-            P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+            CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
             RemoteCall<BigInteger> counter = contract.getCountOwners();
             System.out.println("OWNERS: " + counter.send());
             for (int i = 0; i <= Integer.valueOf(counter.send().toString()) - 1; i++) {

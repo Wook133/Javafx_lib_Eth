@@ -40,7 +40,13 @@ public class deployContracts {
         String contractAddress = contract.getContractAddress();
         System.out.println("Smart contract deployed to address " + contractAddress);
 
-        P3AbsoluteBasic_sol_CowOwnerInfo contract1 = P3AbsoluteBasic_sol_CowOwnerInfo.deploy(
+        CompleteBasic_sol_lifeInformation contract1 = CompleteBasic_sol_lifeInformation.deploy(
+                web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT, new BigInteger("100000")
+        ).send();
+        String contractAddress1 = contract1.getContractAddress();
+        System.out.println("Smart contract CompleteBasic_sol_lifeInformation 1 deployed to address " + contractAddress1);
+
+        /*P3AbsoluteBasic_sol_CowOwnerInfo contract1 = P3AbsoluteBasic_sol_CowOwnerInfo.deploy(
                 web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT, new BigInteger("100000"), "0xE9C2A56b8A3a29C8c85960Bb0037B786e5B85e56", "InfoTemp"
         ).send();
         String contractAddress1 = contract1.getContractAddress();
@@ -53,7 +59,7 @@ public class deployContracts {
 
 
         String contractAddress2 = contract2.getContractAddress();
-        System.out.println("Smart contract P3AbsoluteBasic_sol_lifeInformation 2 deployed to address " + contractAddress2);
+        System.out.println("Smart contract P3AbsoluteBasic_sol_lifeInformation 2 deployed to address " + contractAddress2);*/
 
 
 
