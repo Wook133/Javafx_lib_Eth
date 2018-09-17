@@ -221,11 +221,14 @@ public class Runner extends Application {
             Integer counter = Integer.valueOf(biCount.toString());
             System.out.println("Cow Information Counter = " + counter);
             System.out.println("Cow =" + contract1.getCowAddressPos(BigInteger.ZERO).send());
-            /*for (int i = 0; i <= counter; i++)
+            for (int i = 0; i <= counter - 1; i++)
             {
-                String sInfo = contract2.getPublisherPos(BigInteger.valueOf(i)).send();
+                String sInfo = contract1.getInformationPos(BigInteger.valueOf(i)).send();
+                String sCowAddress = contract1.getCowAddressPos(BigInteger.valueOf(i)).send();
+                String sOwnerAddress = contract1.getPublisherPos(BigInteger.valueOf(i)).send();
+                listRealInfo.add(new Information(sCowAddress, sOwnerAddress, sInfo));
                 System.out.println(sInfo);
-            }*/
+            }
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -234,7 +237,7 @@ public class Runner extends Application {
 
         Scene scene = new Scene(new Group());
         stage.setTitle("All Information");
-        stage.setWidth(850);
+        stage.setWidth(1100);
         stage.setHeight(520);
         TableView table = new TableView();
         final Label label = new Label("Address Book");
@@ -242,22 +245,13 @@ public class Runner extends Application {
         table.setEditable(true);
         TableColumn colCowAdd = new TableColumn("Wagyu Address");
         colCowAdd.setCellValueFactory(new PropertyValueFactory<Information, String>("cowAddress"));
-        colCowAdd.setPrefWidth(200);
+        colCowAdd.setPrefWidth(300);
         TableColumn colOwnerAdd = new TableColumn("Owner Address");
-        colOwnerAdd.setPrefWidth(200);
+        colOwnerAdd.setPrefWidth(300);
         colOwnerAdd.setCellValueFactory(new PropertyValueFactory<Information, String>("ownerAddress"));
         TableColumn colInfo = new TableColumn("Information");
         colInfo.setCellValueFactory(new PropertyValueFactory<Information, String>("info"));
         colInfo.setPrefWidth(400);
-
-        listRealInfo.add(new Information("c0", "a0", "I0"));
-        listRealInfo.add(new Information("c0", "a0", "I1"));
-        listRealInfo.add(new Information("c1", "a0", "I0"));
-        listRealInfo.add(new Information("c1", "a0", "I1"));
-        listRealInfo.add(new Information("c2", "a1", "I0"));
-        listRealInfo.add(new Information("c2", "a1", "I1"));
-        listRealInfo.add(new Information("c2", "a1", "I0"));
-        listRealInfo.add(new Information("c2", "a1", "I1"));
 
         Button btnMenu = new Button("Menu");
         btnMenu.setOnAction(event ->
