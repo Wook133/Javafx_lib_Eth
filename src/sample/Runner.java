@@ -212,6 +212,25 @@ public class Runner extends Application {
 
     public Scene createViewInformation(Stage stage)
     {
+        try {
+            Web3j web3j = Web3j.build(new HttpService());
+            System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+            Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+            P3AbsoluteBasic_sol_lifeInformation contract = P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+            BigInteger biCount =  contract.getCountCows().send();
+            Integer counter = Integer.valueOf(biCount.toString());
+            System.out.println("Cow Information Counter = " + counter);
+            for (int i = 0; i <= counter; i++)
+            {
+                String sInfo = contract.getPublisherPos(BigInteger.valueOf(i)).send();
+                System.out.println(sInfo);
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Failure");
+        }
+
         Scene scene = new Scene(new Group());
         stage.setTitle("All Information");
         stage.setWidth(850);
