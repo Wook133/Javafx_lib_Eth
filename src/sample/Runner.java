@@ -28,8 +28,10 @@ import org.web3j.tx.exceptions.ContractCallException;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Observable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,6 +40,8 @@ public class Runner extends Application {
     boolean loggedIn = false;
     String smartcontractaddress1 = "0xc83bebe3fe6f197715d18d9723458802ce068c8f";
     //String smartcontractaddress2 = "0x519ad27415a49596d915ea9eb4687b2d5108b255";
+
+    ArrayList<String> comboboxOptions = new ArrayList<>();
 
     ArrayList<String> ownerAddress = new ArrayList<>();
     ArrayList<Triple<String, String, String>> listInfo = new ArrayList<>();
@@ -82,11 +86,7 @@ public class Runner extends Application {
 
         scLogin = createLoginScene(primaryStage);
         primaryStage.setScene(scLogin);
-
-
         primaryStage.show();
-
-
     }
 
     public Scene createApproval(Stage stage)
@@ -161,6 +161,83 @@ public class Runner extends Application {
         grid.add(btnMenu, 0,2,2,1);
         scApproval = new Scene(grid);
         return scApproval;
+    }
+
+    public Scene setAddInformationScene(Stage stage)
+    {
+        comboboxOptions.add("Medication");
+        comboboxOptions.add("Food");
+        comboboxOptions.add("Development");
+        comboboxOptions.add("Location");
+        comboboxOptions.add("Distribution");
+        comboboxOptions.add("Slaughter");
+        comboboxOptions.add("Packaging");
+        comboboxOptions.add("Comment");
+        stage.setTitle("Add Information");
+        Scene scene = new Scene(new Group(), 760, 350);
+
+        Button button = new Button ("Add Information");
+        Button buttonMenu = new Button ("Menu");
+        TextArea text = new TextArea ("");
+        Label lblAddress = new Label("Please enter Address of cow");
+        TextField txtAddress = new TextField();
+        txtAddress.setPrefWidth(300);
+        text.setPrefWidth(750);
+
+        final ComboBox cmbAddInformation = new ComboBox();
+        cmbAddInformation.setPrefWidth(300);
+        cmbAddInformation.getItems().addAll(comboboxOptions);
+        cmbAddInformation.setOnAction(event ->
+                {
+                    String stemplate = "";
+
+                    int iselected = comboboxOptions.indexOf(cmbAddInformation.getValue().toString());
+                    stemplate = generateTemplate(iselected);
+                    System.out.println(iselected);
+                    text.insertText(0, cmbAddInformation.getValue().toString()  + ": " + stemplate + System.lineSeparator());
+                }
+        );
+
+        button.setOnAction(event ->
+        {
+            try {
+                Web3j web3j = Web3j.build(new HttpService());
+                System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+                Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+                CompleteBasic_sol_lifeInformation contract = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                contract.addInformation(txtAddress.getText(), text.getText()).send();
+                System.out.println("Information added to Ethereum : " + txtAddress.getText() + ", " + credentials.getAddress() +", " + text.getText());
+                Triple<String, String, String> cur = Triple.of(txtAddress.getText(), credentials.getAddress(), text.getText());
+                listInfo.add(cur);
+                listInfo.sort(new sortByCow());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Failure");
+            }
+        });
+        buttonMenu.setOnAction(event ->
+        {
+            stage.setScene(createMenu(stage));
+        });
+
+
+        GridPane grid = new GridPane();
+        grid.setVgap(20);
+        grid.setHgap(20);
+        grid.setPadding(new Insets(5, 5, 5, 5));
+        grid.add(new Label("Select Template for Information"), 0, 0);
+
+        grid.add(cmbAddInformation, 1, 0);
+        grid.add(lblAddress, 0, 1);
+        grid.add(txtAddress, 1, 1);
+
+        grid.add(text, 0, 2, 4, 1);
+        grid.add(button, 0, 3);
+        grid.add(buttonMenu, 1, 3);
+        Group root = (Group)scene.getRoot();
+        root.getChildren().add(grid);
+        return scene;
     }
 
     public Scene createAddInformation(Stage stage)
@@ -240,7 +317,7 @@ public class Runner extends Application {
         stage.setWidth(1100);
         stage.setHeight(520);
         TableView table = new TableView();
-        final Label label = new Label("Address Book");
+        final Label label = new Label("Wagyu Details");
         label.setFont(new Font("Arial", 16));
         table.setEditable(true);
         TableColumn colCowAdd = new TableColumn("Wagyu Address");
@@ -282,7 +359,7 @@ public class Runner extends Application {
         btnApproval.setOnAction(event -> stage.setScene(createApproval(stage)));
 
         Button btnAddInformaion = new Button("Add Information");
-        btnAddInformaion.setOnAction(event -> stage.setScene(createAddInformation(stage)));
+        btnAddInformaion.setOnAction(event -> stage.setScene(setAddInformationScene(stage)));
 
         Button btnGetInformation = new Button("Get Information");
         btnGetInformation.setOnAction(event -> stage.setScene(createViewInformation(stage)));
@@ -399,6 +476,60 @@ public class Runner extends Application {
             e.printStackTrace();
         }
     }
+
+    public String generateTemplate(int ipos)
+    {
+        String s ="";
+        Long l = System.currentTimeMillis();
+        Date date = new Date(l);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String d = formatter.format(date);
+        switch(ipos)
+        {
+            case 0 :
+            {
+                s = "Medication name; Medication Volume; Vet Details; " + d +"; ";
+            }
+            break;
+            case 1 :
+            {
+                s = "Food name; Food Amount; Feeder Details; " + d +"; ";
+            }
+            break;
+            case 2:
+            {
+                s = "Height; Mass; Value; Examiners Details; " + d +"; ";
+            }
+            break;
+            case 3 :
+            {
+                s = "Location Name ; Location GPS Longitude; Location GPS Latitude; Tracker Details;" + d +"; ";
+            }
+            break;
+            case 4 :
+            {
+                s = "Distribution Name ; Distribution Location GPS Longitude; Distribution Location GPS Latitude; Market Details;" + d +"; ";
+            }
+            break;
+            case 5:
+            {
+                s = "Kosher; Halal; Mass Before; Mass After; Value; Butcher Details; " + d +"; ";
+            }
+            break;
+            case 6:
+            {
+                s = "Package Label; Package Mass; Value; Packager Details; " + d +"; ";
+            }
+            break;
+            default:
+            {
+                s = "Comments;";
+            }
+
+        }
+        return s;
+    }
+
 }
 
 class sortByCow implements Comparator<Triple<String, String, String>>
