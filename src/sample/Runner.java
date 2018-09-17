@@ -1,12 +1,13 @@
 package sample;
-
+//https://medium.com/coinmonks/ethereum-blockchain-hello-world-smart-contract-with-java-9b6ae2961ad1
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Observable;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
@@ -34,6 +36,8 @@ public class Runner extends Application {
 
     ArrayList<String> ownerAddress = new ArrayList<>();
     ArrayList<Triple<String, String, String>> listInfo = new ArrayList<>();
+    ArrayList<Information> listRealInfo = new ArrayList<>();
+    ObservableList<Information> observeInfo = FXCollections.observableArrayList(listRealInfo);
 
     public File selectedFile;
     public String sPath;
@@ -45,6 +49,17 @@ public class Runner extends Application {
     Scene scGetInformation;
 
     public String sPassword;
+
+    private void setupInformation()
+    {
+        observeInfo.clear();
+        for (Triple<String, String, String> stemp : listInfo)
+        {
+            Information cur = new Information(stemp.getLeft(), stemp.getMiddle(), stemp.getRight());
+            observeInfo.add(cur);
+        }
+
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -140,16 +155,89 @@ public class Runner extends Application {
     public Scene createAddInformation(Stage stage)
     {
         GridPane grid = new GridPane();
-        grid.setPrefWidth(400.0);
-        grid.setPrefHeight(200.0);
+        grid.setPrefWidth(600.0);
+        grid.setPrefHeight(400.0);
         grid.setVgap(4);
         grid.setPadding(new Insets(5, 5, 5, 5));
-        Label lblAddress = new Label("Please enter Address");
+        Label lblAddress = new Label("Please enter Address of cow");
         TextField txtAddress = new TextField();
-        Button btnAddOwner = new Button("Add Owner");
+        Label lblInfo = new Label("Please enter Information you wish to add");
+        TextArea txtInfo = new TextArea();
+        Button btnAddInformation = new Button("Add Information to Ethereum");
+        btnAddInformation.setOnAction(event ->
+        {
+            try {
+                Web3j web3j = Web3j.build(new HttpService());
+                System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+                Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+                test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+                contract.addInformation(txtAddress.getText(), txtInfo.getText()).send();
+                System.out.println("Information added to Ethereum ");
+                Triple<String, String, String> cur = Triple.of(txtAddress.getText(), credentials.getAddress(), txtInfo.getText());
+                listInfo.add(cur);
+                listInfo.sort(new sortByCow());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Failure");
+            }
+        });
+        Button btnMenu = new Button("Menu");
+        btnMenu.setOnAction(event ->
+        {
+            stage.setScene(createMenu(stage));
+        });
+        grid.add(lblAddress, 0, 0);
+        grid.add(txtAddress, 1, 0);
+        grid.add(lblInfo, 0, 1);
+        grid.add(txtInfo, 1, 1, 5, 1);
+        grid.add(btnAddInformation, 2, 1);
+        grid.add(btnMenu, 0,2);
+
+        scAddInformation = new Scene(grid);
+
         return scAddInformation;
     }
 
+    public Scene createViewInformation(Stage stage)
+    {
+        VBox root = new VBox();
+        root.setSpacing(10);
+        root.setFillWidth(true);
+        root.setPadding(new Insets(5));
+
+        setupInformation();
+
+        TableView<Information> tblInformation = new TableView<>();
+        TableColumn colCowAdd = new TableColumn("Wagyu Address");
+
+        colCowAdd.setCellValueFactory(new PropertyValueFactory("wagyu_address"));
+        colCowAdd.setPrefWidth(200);
+
+        TableColumn colOwnerAdd = new TableColumn("Owner Address");
+        colOwnerAdd.setCellValueFactory(new PropertyValueFactory("owner_address"));
+        colOwnerAdd.setPrefWidth(200);
+
+        TableColumn colInfo = new TableColumn("Information");
+        colInfo.setCellValueFactory(new PropertyValueFactory("information"));
+        colInfo.setPrefWidth(400);
+
+        tblInformation.setId("table");
+        tblInformation.getColumns().addAll(colCowAdd, colOwnerAdd, colInfo);
+        tblInformation.setItems(observeInfo);
+
+
+        Button btnMenu = new Button("Menu");
+        btnMenu.setOnAction(event ->
+        {
+            stage.setScene(createMenu(stage));
+        });
+        root.getChildren().addAll(
+                new Label("Information"), btnMenu);
+        scAddInformation = new Scene(root);
+
+        return scGetInformation;
+    }
 
 
     public Scene createMenu(Stage stage)
@@ -164,10 +252,12 @@ public class Runner extends Application {
         btnApproval.setOnAction(event -> stage.setScene(createApproval(stage)));
 
         Button btnAddInformaion = new Button("Add Information");
+        btnAddInformaion.setOnAction(event -> stage.setScene(createAddInformation(stage)));
 
         Button btnGetInformation = new Button("Get Information");
-        Button btnGetAllCows = new Button("All Wagyu Cattle");
-        Button btnGetAllOwners = new Button("All Owners");
+
+        /*Button btnGetAllCows = new Button("All Wagyu Cattle");
+        Button btnGetAllOwners = new Button("All Owners");*/
 
         Button btnClose = new Button("Close");
         btnClose.setOnAction(event -> stage.close());
@@ -175,8 +265,8 @@ public class Runner extends Application {
         grid.add(btnApproval, 0, 0);
         grid.add(btnAddInformaion, 1, 0);
         grid.add(btnGetInformation, 0, 1);
-        grid.add(btnGetAllCows, 1, 1);
-        grid.add(btnGetAllOwners, 0, 2);
+       /* grid.add(btnGetAllCows, 1, 1);
+        grid.add(btnGetAllOwners, 0, 2);*/
         grid.add(btnClose, 1, 2);
         scMenu = new Scene((grid));
         return scMenu;
@@ -272,6 +362,7 @@ public class Runner extends Application {
                 listInfo.add(stemp);
                 System.out.println(s);
             }
+            listInfo.sort(new sortByCow());
         }
 
         catch (CipherException ce)
