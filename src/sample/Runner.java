@@ -4,6 +4,9 @@ import com.sun.xml.internal.txw2.TxwException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -346,6 +349,113 @@ public class Runner extends Application {
         return scene;
     }
 
+    public Scene createFilteredInformationView(Stage stage)
+    {
+        try {
+            Web3j web3j = Web3j.build(new HttpService());
+            System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
+            Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
+            CompleteBasic_sol_lifeInformation contract1 = CompleteBasic_sol_lifeInformation.load(smartcontractaddress1, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+            BigInteger biCount =  contract1.getCountCows().send();
+            Integer counter = Integer.valueOf(biCount.toString());
+            System.out.println("Cow Information Counter = " + counter);
+            System.out.println("Cow =" + contract1.getCowAddressPos(BigInteger.ZERO).send());
+            listRealInfo.clear();
+            for (int i = 0; i <= counter - 1; i++)
+            {
+                String sInfo = contract1.getInformationPos(BigInteger.valueOf(i)).send();
+                String sCowAddress = contract1.getCowAddressPos(BigInteger.valueOf(i)).send();
+                String sOwnerAddress = contract1.getPublisherPos(BigInteger.valueOf(i)).send();
+                listRealInfo.add(new Information(sCowAddress, sOwnerAddress, sInfo));
+                System.out.println(sInfo);
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Failure");
+        }
+        Scene scene = new Scene(new Group());
+        stage.setTitle("All Information");
+        stage.setWidth(1300);
+        stage.setHeight(580);
+        TableView table = new TableView();
+        final Label label = new Label("Wagyu Details");
+        label.setFont(new Font("Arial", 16));
+        table.setEditable(true);
+        final Label lblFilter = new Label("Filter");
+        TextField filterField = new TextField();
+
+
+        Button btnMenu = new Button("Menu");
+        btnMenu.setOnAction(event ->
+        {
+            stage.setScene(createMenu(stage));
+        });
+        final ObservableList<Information> data  = popObservableData(listRealInfo);
+        table = Initialize(data, filterField);
+
+        //table.setItems(data);
+       // table.getColumns().addAll(colCowAdd, colOwnerAdd, colInfo);
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(label, lblFilter, filterField, table, btnMenu);
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+        return scene;
+    }
+
+
+    public TableView<Information> Initialize(ObservableList<Information> data, TextField filterField)
+    {
+        TableView table = new TableView();
+        TableColumn<Information, String> firstNameColumn = new TableColumn<>();
+        firstNameColumn.setPrefWidth(300);
+        TableColumn<Information, String> middleNameColumn  = new TableColumn<>();
+        middleNameColumn.setPrefWidth(300);
+        TableColumn<Information, String> lastNameColumn  = new TableColumn<>();
+        lastNameColumn.setPrefWidth(600);
+        firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().cowAddressProperty());
+        middleNameColumn.setCellValueFactory(cellData -> cellData.getValue().ownerAddressProperty());
+        lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().infoProperty());
+        table.getColumns().addAll(firstNameColumn, middleNameColumn, lastNameColumn);
+        // 1. Wrap the ObservableList in a FilteredList (initially display all data).
+        FilteredList<Information> filteredData = new FilteredList<>(data, p -> true);
+
+        // 2. Set the filter Predicate whenever the filter changes.
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(info -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (info.getCowAddress().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches cow address.
+                }
+                else if (info.getOwnerAddress().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches owner address.
+                }
+                else if (info.getInfo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches information.
+                }
+                return false; // Does not match.
+            });
+        });
+
+        // 3. Wrap the FilteredList in a SortedList.
+        SortedList<Information> sortedData = new SortedList<>(filteredData);
+
+        // 4. Bind the SortedList comparator to the TableView comparator.
+        sortedData.comparatorProperty().bind(table.comparatorProperty());
+
+        // 5. Add sorted (and filtered) data to the table.
+        table.setItems(sortedData);
+        return table;
+    }
+
 
     public Scene createMenu(Stage stage)
     {
@@ -364,6 +474,9 @@ public class Runner extends Application {
         Button btnGetInformation = new Button("Get Information");
         btnGetInformation.setOnAction(event -> stage.setScene(createViewInformation(stage)));
 
+        Button btnFilterInformation = new Button("Filter Information");
+        btnFilterInformation.setOnAction(event -> stage.setScene(createFilteredInformationView(stage)));
+
         /*Button btnGetAllCows = new Button("All Wagyu Cattle");
         Button btnGetAllOwners = new Button("All Owners");*/
 
@@ -373,6 +486,7 @@ public class Runner extends Application {
         grid.add(btnApproval, 0, 0);
         grid.add(btnAddInformaion, 1, 0);
         grid.add(btnGetInformation, 0, 1);
+        grid.add(btnFilterInformation, 1, 1);
        /* grid.add(btnGetAllCows, 1, 1);
         grid.add(btnGetAllOwners, 0, 2);*/
         grid.add(btnClose, 1, 2);
