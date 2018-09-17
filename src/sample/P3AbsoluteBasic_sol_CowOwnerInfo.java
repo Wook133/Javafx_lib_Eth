@@ -1,4 +1,4 @@
-package test;
+package sample;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -96,14 +96,14 @@ public class P3AbsoluteBasic_sol_CowOwnerInfo extends Contract {
     }
 
     public static RemoteCall<P3AbsoluteBasic_sol_CowOwnerInfo> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit, BigInteger initialWeiValue, String c, String info) {
-        String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(c), 
-                new org.web3j.abi.datatypes.Utf8String(info)));
+        String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new Address(c),
+                new Utf8String(info)));
         return deployRemoteCall(P3AbsoluteBasic_sol_CowOwnerInfo.class, web3j, credentials, gasPrice, gasLimit, BINARY, encodedConstructor, initialWeiValue);
     }
 
     public static RemoteCall<P3AbsoluteBasic_sol_CowOwnerInfo> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit, BigInteger initialWeiValue, String c, String info) {
-        String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(c), 
-                new org.web3j.abi.datatypes.Utf8String(info)));
+        String encodedConstructor = FunctionEncoder.encodeConstructor(Arrays.<Type>asList(new Address(c),
+                new Utf8String(info)));
         return deployRemoteCall(P3AbsoluteBasic_sol_CowOwnerInfo.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, encodedConstructor, initialWeiValue);
     }
 
