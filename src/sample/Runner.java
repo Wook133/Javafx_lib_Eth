@@ -10,22 +10,30 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.tuple.Triple;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tx.Contract;
 import org.web3j.tx.ManagedTransaction;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Runner extends Application {
     boolean loggedIn = false;
     String smartcontractaddress1 = "0xef9e839064631c365162877c038d25304d4deb3a";
     String smartcontractaddress2 = "0xfb1203e8db28cf7cd6b9e21d66c4eae8b9977c64";
+
+    ArrayList<String> ownerAddress = new ArrayList<>();
+    ArrayList<Triple<String, String, String>> listInfo = new ArrayList<>();
 
     public File selectedFile;
     public String sPath;
@@ -72,7 +80,7 @@ public class Runner extends Application {
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
                 test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
-                contract.addOwners(txtAddress.getText());
+                contract.addOwners(txtAddress.getText()).send();
                 System.out.println("Owner added with approval for " + txtAddress.getText());
             } catch (Exception e)
             {
@@ -88,7 +96,7 @@ public class Runner extends Application {
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
                 test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
-                contract.addApproval(txtAddress.getText());
+                contract.addApproval(txtAddress.getText()).send();
                 System.out.println("Approval for " + txtAddress.getText());
             } catch (Exception e)
             {
@@ -98,14 +106,14 @@ public class Runner extends Application {
         });
 
         Button btnRemoveApproval = new Button("Disapprove");
-        btnAddApproval.setOnAction(event ->
+        btnRemoveApproval.setOnAction(event ->
         {
             try {
                 Web3j web3j = Web3j.build(new HttpService());
                 System.out.println("Connected to Ethereum client version: " + web3j.web3ClientVersion().send().getWeb3ClientVersion().toString());
                 Credentials credentials = WalletUtils.loadCredentials(sPassword, sPath);
                 test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
-                contract.removeApproval(txtAddress.getText());
+                contract.removeApproval(txtAddress.getText()).send();
                 System.out.println("Removed approval for " + txtAddress.getText());
             } catch (Exception e)
             {
@@ -247,9 +255,25 @@ public class Runner extends Application {
             System.out.println("Credentials loaded: " + credentials.getAddress());
             loggedIn = true;
             System.out.println("Correct Password and keystore combo");
-           // stage.setScene(new Scene(new Pane()));
-
+            test.P3AbsoluteBasic_sol_lifeInformation contract = test.P3AbsoluteBasic_sol_lifeInformation.load(smartcontractaddress2, web3j, credentials, ManagedTransaction.GAS_PRICE, Contract.GAS_LIMIT);
+            RemoteCall<BigInteger> counter = contract.getCountOwners();
+            System.out.println(counter.send());
+            for (int i =0; i <= Integer.valueOf(counter.send().toString()); i++)
+            {
+                String s = contract.getOwner(BigInteger.valueOf(i)).send();
+                ownerAddress.add(s);
+                System.out.println(s);
+            }
+            RemoteCall<BigInteger> counterInfo = contract.getCountCows();
+            for (int i =0; i <= Integer.valueOf(counterInfo.send().toString()); i++)
+            {
+                Tuple3<String, String, String> s = contract.getPos(BigInteger.valueOf(i)).send();
+                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());
+                listInfo.add(stemp);
+                System.out.println(s);
+            }
         }
+
         catch (CipherException ce)
         {
             loggedIn = false;
@@ -261,6 +285,53 @@ public class Runner extends Application {
             e.printStackTrace();
         }
     }
+}
 
-
+class sortByCow implements Comparator<Triple<String, String, String>>
+{
+    @Override
+    public int compare(Triple<String, String, String> a, Triple<String, String, String> b)
+    {
+        int d =0;
+        try {
+            d = a.getLeft().compareTo(b.getLeft());
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+        return d;
+    }
+}
+class sortByOwner implements Comparator<Triple<String, String, String>>
+{
+    @Override
+    public int compare(Triple<String, String, String> a, Triple<String, String, String> b)
+    {
+        int d =0;
+        try {
+            d = a.getMiddle().compareTo(b.getMiddle());
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+        return d;
+    }
+}
+class sortByInformation implements Comparator<Triple<String, String, String>>
+{
+    @Override
+    public int compare(Triple<String, String, String> a, Triple<String, String, String> b)
+    {
+        int d =0;
+        try {
+            d = a.getRight().compareTo(b.getRight());
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+        return d;
+    }
 }
