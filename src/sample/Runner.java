@@ -507,22 +507,22 @@ public class Runner extends Application {
         Button btnLogin = new Button("Login");
         btnLogin.setId("login");
 
-        TextField txtPassword = new TextField("");
+        PasswordField txtPassword = new PasswordField();
         txtPassword.setId("password");
         Label lbl2 = new Label("Enter your password: ");
 
         Region p = new Region();
         p.setPrefSize(200.0, 0.0);
         Region p2 = new Region();
-        p2.setPrefSize(100.0, 0.0);
+        p2.setPrefSize(115.0, 0.0);
         flowPane.getChildren().addAll(lbl, btnLoad, p,
                 lbl2, txtPassword, p2,
                 btnLogin
         );
-        Canvas canvas = new Canvas(200, 200);
-        canvas.setId("canvas");
+       // Canvas canvas = new Canvas(200, 200);
+        //canvas.setId("canvas");
         borderPane.setTop(flowPane);
-        borderPane.setCenter(canvas);
+       // borderPane.setCenter(canvas);
         btnLoad.setOnAction(event -> loadKeystore(stage));
         AtomicReference<Scene> scTemp = new AtomicReference<>(new Scene((borderPane)));
         btnLogin.setOnAction(event ->
@@ -556,7 +556,7 @@ public class Runner extends Application {
             e.printStackTrace();
         }
     }
-    private void login(TextField txtPassword, Stage stage)
+    private void login(PasswordField txtPassword, Stage stage)
     {
         try {
             sPassword = txtPassword.getText();
