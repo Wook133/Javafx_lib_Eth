@@ -358,12 +358,19 @@ public class Runner extends Application {
             }
             RemoteCall<BigInteger> counterInfo = contract.getCountCows();
             System.out.println("COWS: " + counterInfo.send());
-            for (int i =0; i <= Integer.valueOf(counterInfo.send().toString()); i++)
+            for (int j =0; j <= Integer.valueOf(counterInfo.send().toString()); j++)
             {
-                Tuple3<String, String, String> s = contract.getPos(BigInteger.valueOf(i)).send();
-                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());
+                //System.out.println(contract.getPos(BigInteger.valueOf(i)).send().toString());
+
+               /* Tuple3<String, String, String> s = new Tuple3<>(contract.getPos(BigInteger.valueOf(j)).send().getValue1(),
+                        contract.getPos(BigInteger.valueOf(j)).send().getValue2(),
+                        contract.getPos(BigInteger.valueOf(j)).send().getValue3()) ;
+                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());*/
+                Triple<String, String, String> stemp = Triple.of(contract.getPos(BigInteger.valueOf(j)).send().getValue1(),
+                        contract.getPos(BigInteger.valueOf(j)).send().getValue2(),
+                        contract.getPos(BigInteger.valueOf(j)).send().getValue3());
                 listInfo.add(stemp);
-                System.out.println(s);
+                System.out.println(stemp.toString());
             }
             listInfo.sort(new sortByCow());
         }
