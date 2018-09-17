@@ -367,7 +367,6 @@ public class Runner extends Application {
     }
     private void login(TextField txtPassword, Stage stage)
     {
-
         try {
             sPassword = txtPassword.getText();
             System.out.println("Password: " + sPassword);
@@ -386,52 +385,9 @@ public class Runner extends Application {
                 System.out.println(s);
             }
             RemoteCall<BigInteger> counterInfo = contract.getCountCows();
-
             System.out.println("COWS: " + counterInfo.send());
-           /* try {
-                String s = contract.getInformationPos(BigInteger.valueOf(0)).send();
-                System.out.println(s);
-            }
-            catch (ContractCallException exc)
-            {
-                exc.printStackTrace();
-            }*/
-
-            /*RemoteCall<String> one      = contract.getCowAddressPos(BigInteger.valueOf(1));
-            RemoteCall<String> two      = contract.getPublisherPos(BigInteger.valueOf(1));
-            CompletableFuture<String> three    = contract.getInformationPos(BigInteger.valueOf(0)).sendAsync();*/
-
-           /* System.out.println(one.send().toString());
-            System.out.println(two.send().toString());
-            System.out.println(three.);*/
-           /* for (int j = 0; j <= Integer.valueOf(counterInfo.send().toString()) - 1; j++) {
-                RemoteCall<String> one      = contract.getCowAddressPos(BigInteger.valueOf(j));
-                RemoteCall<String> two      = contract.getPublisherPos(BigInteger.valueOf(j));
-                RemoteCall<String> three    = contract.getInformationPos(BigInteger.valueOf(j));
-
-                System.out.println(one.send().toString());
-                System.out.println(two.send().toString());
-                System.out.println(three.send().toString());
-                Triple<String, String, String> temp = Triple.of(one.send(), two.send(), three.send());
-                listInfo.add(temp);
-                System.out.println(temp.toString());
-                //System.out.println(contract.getPos(BigInteger.valueOf(i)).send().toString());
-
-               /* Tuple3<String, String, String> s = new Tuple3<>(contract.getPos(BigInteger.valueOf(j)).send().getValue1(),
-                        contract.getPos(BigInteger.valueOf(j)).send().getValue2(),
-                        contract.getPos(BigInteger.valueOf(j)).send().getValue3()) ;
-                Triple<String, String, String> stemp = Triple.of(s.getValue1().toString(), s.getValue2().toString(), s.getValue3().toString());
-                Triple<String, String, String> stemp = Triple.of(contract.getCowAddressPos(BigInteger.valueOf(j)).send(),
-                        contract.getCowAddressPos(BigInteger.valueOf(j)).send(),
-                        contract.getInformationPos(BigInteger.valueOf(j)).send());
-                listInfo.add(stemp);
-                System.out.println(stemp.toString());*/
-
-           /* }*/
             listInfo.sort(new sortByCow());
         }
-
-
         catch (CipherException ce)
         {
             loggedIn = false;
@@ -493,3 +449,4 @@ class sortByInformation implements Comparator<Triple<String, String, String>>
         return d;
     }
 }
+
